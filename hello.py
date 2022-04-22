@@ -10,7 +10,7 @@ if __name__ == '__main__':
 #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
 
 git init
-git add README.md
+git add .
 git commit -m "first commit"
 git branch -M main
 git remote add origin https://github.com/Imixanxa/basura.git

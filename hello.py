@@ -8,12 +8,12 @@ if __name__ == '__main__':
 
 
 #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
-
+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
 git init
 git add .
 git commit -m "first commit"
 git branch -M main
-git remote add origin https://github.com/Imixanxa/basura.git
+git remote set-url origin https://github.com/Imixanxa/basura.git
 git push -u origin main
 
 push an existing repository from the command line

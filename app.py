@@ -583,100 +583,84 @@ def Subtopico_revisita_aux(idt, idplan):
                                stustatus=(rcdmst[3]),
                                semanai=(rcdplan[6]),
                                semanaf=(rcdplan[7]),
-                               topics=(rcdplan[8]), idt=idt, idplan=idplan)
-
-
+                               topics=(rcdplan[8]),
+                               idt=idt,
+                               idplan=idplan)
 @app.route('/Subtopico_rev_pre_wrt/<idaux> <idplan> <idt>', methods=['POST', 'GET'])
 def Subtopico_rev_pre_wrt(idaux, idplan, idt):
-    print(request.method)
     if request.method == 'GET':
         inx = cnx.cursor(buffered=True)
-        stmt = """ SELECT mstid, mstname, mstgenero, msttipoe, mststatus FROM mststudent WHERE mstid = %s """
+        stmt = """ SELECT mstid, mstname, mstgenero, msttipoe, mststatus 
+        FROM mststudent 
+        WHERE mstid = %s """
         inx.execute(stmt, (idt,))
         rcdmst = inx.fetchone()
 
         inx = cnx.cursor(buffered=True)
-        stmt = """ SELECT mstid, mstname, mstgenero, msttipoe, mststatus FROM mststudent where mstid = %s """
+        stmt = """ SELECT mstid, mstname, mstgenero, msttipoe, mststatus 
+        from mststudent 
+        where mstid = %s """
         inx.execute(stmt, (idaux,))
         rcdmsta = inx.fetchone()
-
         inx = cnx.cursor(buffered=True)
-        stmt = """ SELECT * FROM programamensual where pgmid_pm = %s """
+        stmt = """ SELECT * from programamensual where pgmid_pm = %s """
         inx.execute(stmt, (idplan,))
         rcdplan = inx.fetchone()
-
         if not rcdmst:
             flash(f'error grave: no hay Id titular:, {idt}')
             return redirect(url_for('auxiliar', idt=idt, idpgmmonth=idplan))
-
         if not rcdplan:
             flash(f'error grave: no hay id plan: {idplan} ')
             return redirect(url_for('auxiliar', idt=idt, idpgmmonth=idplan))
-
         if not rcdmsta:
             flash(f'error grave: no hay Id auxiliar, {idaux}')
             return redirect(url_for('auxiliar', idt=idt, idpgmmonth=idplan))
-
         if (rcdmst[2]) != (rcdmsta[2]):
             flash(f'error en datos, revise el genero, {(rcdmsta[1])} ')
             return render_template('Subtopico_revisita_auxfm.html', stuname=(rcdmst[1]),
                                    stugenero=(rcdmst[2]), stustatus=(rcdmst[4]), semanai=(rcdplan[6]),
                                    semanaf=(rcdplan[7]), topico=(rcdplan[8]), idpgmmonth=idplan, idt=idt)
-
         return render_template('Subtopico_wrt_revisita.html', dataprim=rcdplan, recstudt=rcdmst,
                                recstuda=rcdmsta)
     else:
         return render_template('revisita.html')
-
-
 @app.route('/Topico_lectura_w/<idt> <idpgm_month>')
 def pre_grabacion_lect(idt, idpgm_month):
     inx = cnx.cursor(buffered=True)
-    stmt = """ select mstid, mstname, mstgenero, msttipoe, mststatus 
-  FROM mststudent where mstid = %s """
+    stmt = """ select mstid, mstname, mstgenero, msttipoe, mststatus from mststudent where mstid = %s """
     inx.execute(stmt, (idt,))
     rcdmst = inx.fetchone()
-
     if not rcdmst:
-        flash(f'maestro de estudiante no hay, {idt}')
+        flash(f'no hay registro del estudiante, {idt}')
         return redirect(url_for('Index'))
-
     stmt = """ select * from programamensual where pgmid_pm = %s """
     inx.execute(stmt, (idpgm_month,))
     rcdplan = inx.fetchone()
-
     if not rcdplan:
-        flash(f'registro para el programa mensual no hay, {idpgm_month}')
+        flash(f'No hay informacion del plan maestro V&MC,  {idpgm_month}')
         return redirect(url_for('Index'))
-
     return render_template('Topico_pre_w_lecturafm.html', dataprim=rcdplan, rcdstudent=rcdmst)
-
 
 @app.route('/srv_hst_mst_namexyz/<mstida> <pgmid_id>')
 def auxiliar(mstida, pgmid_id):
     inx = cnx.cursor(buffered=True)
-    stmt = """select * FROM programamensual where pgmid_pm = %s """
+    stmt = """select * from programamensual where pgmid_pm = %s """
     inx.execute(stmt, (pgmid_id,))
     rcdplan = inx.fetchone()
-
     inx = cnx.cursor(buffered=True)
     stmt = """select hstid, hstyear, hstmonth, hstname, hstid2,  hstname2, hstasig, mstgenero, mststatus 
-  FROM msthistori a INNER JOIN mststudent b ON a.hstid2 = b.mstid
-  WHERE a.hstid2 = %s
-  ORDER by hstname2, hstyear, hstmonth """
+            FROM msthistori a INNER JOIN mststudent b ON a.hstid2 = b.mstid
+            WHERE a.hstid2 = %s
+            ORDER by hstname2, hstyear, hstmonth """
     inx.execute(stmt, (mstida,))
     studentshst = inx.fetchone()
-
     if not studentshst:
         flash('el id auxiliar no existe, {mstida}')
         return render_template('topico_revisitafm.html', students=studentshst, pgmid=pgmid_id,
                                semanai=(rcdplan[6]), semanaf=(rcdplan[7]), tipo=(rcdplan[8]))
-
     return render_template('Subtopico_revisita_auxfm.html', stuname=(studentshst[5]),
                            stugenero=(studentshst[7]), stustatus=(studentshst[8]), semanai=(rcdplan[6]),
                            semanaf=(rcdplan[7]), topico=(rcdplan[8]), idpgmmonth=pgmid_id, idt=mstida)
-
-
 @app.route('/Topico_lect_upd_vmc/<pgmid> <idt>', methods=['GET', 'POST'])
 def Topico_lect_upd_vmc(pgmid, idt):
     if request.method == 'POST':
@@ -684,21 +668,17 @@ def Topico_lect_upd_vmc(pgmid, idt):
         stmtsql = """ select * from programamensual where pgmid_pm = %s """
         inx.execute(stmtsql, (pgmid,))
         rcdpgm_month = inx.fetchone()
-
         meses = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
                  'November', 'December']
         bool = False
         mesnum = 1
-
         for mes in meses:
             mes_buscado = (rcdpgm_month[5]).find(mes)
-
             if int(mes_buscado) >= 0:
                 index_guion = (rcdpgm_month[5]).find('-')
                 index_blank = (rcdpgm_month[5]).find(" ")
                 bool = True
                 flagmesinicial = False
-
                 i = 0
                 while i < len(meses):
                     if ((rcdpgm_month[5])[0:index_blank]) == meses[i]:
@@ -709,16 +689,12 @@ def Topico_lect_upd_vmc(pgmid, idt):
                             j = i + 1
                         break
                     i += 1
-
                 primerafecha = (rcdpgm_month[5])[0:index_guion - 1]
-
                 if i < 9 and flagmesinicial == True:
                     primerafecha = primerafecha.replace(meses[i], ('0' + str(j)))
                 else:
                     primerafecha = primerafecha.replace(mes, str(mesnum))
-
                 if (flagmesinicial == True):
-                    # el texto empieza con el nombre del mes
                     primerafechames = primerafecha[0:2]
                     primerafechadia = primerafecha[3:5]
                     primerafechaano = primerafecha[6:11]
@@ -729,7 +705,6 @@ def Topico_lect_upd_vmc(pgmid, idt):
                     pgmdateinicial = datetime.strptime(primerafecha, '%d de %m de %Y a las %H:%M')
                     pgmdateinicial = pgmdateinicial.strftime('%d-%m-%Y')
             mesnum += 1
-
         if not bool:
             sqlstmt = """ select * from mststudent where mstid=%s"""
             inx = cnx.cursor(buffered=True)
@@ -737,7 +712,6 @@ def Topico_lect_upd_vmc(pgmid, idt):
             rcd_stu_name = inx.fetchone()
             flash(f'fecha full no tiene mes latino:, (rcdpgm_month[5])')
             return redirect(url_for('Index'))
-
         fechafalse = datetime(int(pgmdateinicial[6:10]), int(pgmdateinicial[3:5]), int(pgmdateinicial[0:2]))
         pgmdatefinal = fechafalse + timedelta(days=6)
         pgmdatefinal = pgmdatefinal.strftime('%d-%m-%Y')
@@ -756,41 +730,37 @@ def Topico_lect_upd_vmc(pgmid, idt):
         inx = cnx.cursor(buffered=True)
         updatesql = """ UPDATE programamensual SET actualizadofecha = '{}', actualizadohora = '{}',
         pgmdateinicial = '{}', pgmdatefinal = '{}'
-    WHERE
+        WHERE
         pgmid_pm = '{}'
-    """.format(fecha, hora, pgmdateinicial, pgmdatefinal, pgmid)
+        """.format(fecha, hora, pgmdateinicial, pgmdatefinal, pgmid)
 
         pgmfechaistr = pgmdateinicial.strftime('%B %d, %Y')
         pgmfechafstr = pgmdatefinal.strftime('%B %d, %Y')
-
-        # peticion
         pgmtipoasig = request.form['pgmtipoasig']
         pgmtexto = request.form['pgmtexto']
         pgmsala = request.form['Req_sala']
         pgmtipot = request.form['Req_tipot']
         pgmnombret = request.form['Req_nombret']
         pgmgenerot = request.form['Req_sexot']
-
         inx = cnx.cursor(buffered=True)
         sqlinsert = """INSERT INTO asignaciones (idt_asig, pgmano, pgmmes, pgmtiempo, pgmleccion, 
-    pgmsemanafull, pgmtipoasig, pgmtexto, pgmsala, pgmtipot, pgmtipoa, pgmnombret, pgmnombrea, 
-    pgmgenerot, pgmgeneroa, cumplio, pgmdateinicial, pgmdatefinal, pgmfechaistr, pgmfechafstr) 
-    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+                    pgmsemanafull, pgmtipoasig, pgmtexto, pgmsala, pgmtipot, pgmtipoa, pgmnombret, 
+                    pgmnombrea, pgmgenerot, pgmgeneroa, cumplio, pgmdateinicial, pgmdatefinal, 
+                    pgmfechaistr, pgmfechafstr) 
+                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
         sqlvalue = (idt, (rcdpgm_month[1]), (rcdpgm_month[2]), (rcdpgm_month[3]), (rcdpgm_month[4]),
                     (rcdpgm_month[5]), pgmtipoasig, pgmtexto, pgmsala, pgmtipot, ' ', pgmnombret, ' ', pgmgenerot,
                     ' ', 'XY', pgmdateinicial, pgmdatefinal, pgmfechaistr, pgmfechafstr)
-
         sql_mst = """ select * from mststudent where mstid = %s """
         cnxsql = cnx.cursor(buffered=True)
         cnxsql.execute(sql_mst, (idt,))
         rcd_mst = cnxsql.fetchone()
-
-        sql_hst = """ insert into msthistori 
-    values ( %s, %s, %s, %s, %s, %s, %s) """
+        sql_hst = """ insert into msthistori values ( %s, %s, %s, %s, %s, %s, %s) """
         sql_hst_values = (idt, (rcdpgm_month[1]), (rcdpgm_month[2]), (rcd_mst[1]), idt, (rcd_mst[1]), pgmtipoasig)
-
         sqlkeydup = """ select * from msthistori 
-    where hstyear = %s and hstmonth = %s and hstname = %s  """
+                    where hstyear = %s 
+                    and hstmonth = %s 
+                    and hstname = %s  """
         sqlkeydupv = ((rcdpgm_month[1]), (rcdpgm_month[2]), (rcd_mst[1]))
         inx = cnx.cursor(buffered=True)
         inx.execute(sqlkeydup, sqlkeydupv)
@@ -805,8 +775,6 @@ def Topico_lect_upd_vmc(pgmid, idt):
                         (keydup[3]) == (rcd_mst[1])):
                     flash(f'Error-1. student already assigned in that period, {(rcd_mst[1])} ')
                     return redirect(url_for('Index'))
-        print('NO hay duplicado en el historico: ', datetime.now(), ' ', sqlkeydupv)
-
         try:
             cnxsql = cnx.cursor(buffered=True)
             inx.execute(updatesql)
@@ -815,7 +783,6 @@ def Topico_lect_upd_vmc(pgmid, idt):
             print(e)
             flash(f'no se pudo actualizar base programa mensual, {pgmid}')
             return redirect(url_for('Index'))
-
         try:
             cnxsql = cnx.cursor(buffered=True)
             inx.execute(sqlinsert, sqlvalue)
@@ -824,7 +791,6 @@ def Topico_lect_upd_vmc(pgmid, idt):
             print(e)
             flash('Error al crear asignacion del estudiante, revise por favor')
             return redirect(url_for('Index'))
-
         try:
             cnxsql = cnx.cursor(buffered=True)
             cnxsql.execute(sql_hst, sql_hst_values)
@@ -833,11 +799,8 @@ def Topico_lect_upd_vmc(pgmid, idt):
             print(e)
             flash('error al insertar record historico')
     return redirect(url_for('Index'))
-
-
 @app.route('/srv_aux/<idname> <idpgmmonth> <idt>')
 def procesoest_aux(idname, idpgmmonth, idt):
-    print(idname, ' ', idpgmmonth, ' ', idt)
     inx = cnx.cursor(buffered=True)
     stmt = """ SELECT mstid, mstname, mstgenero, msttipoe, mststatus FROM mststudent where mstid = %s """
     inx.execute(stmt, (idt,))
@@ -854,7 +817,10 @@ def procesoest_aux(idname, idpgmmonth, idt):
     if pgmgenerot != pgmgeneroa:
         flash(f'students must be of the same sex, {idname}')
         inx = cnx.cursor()
-        stmt = 'SELECT hstid, hstyear, hstmonth, hstname, hstid2, hstname2, hstasig, mstgenero, mststatus FROM msthistori a, mststudent b where a.hstid = b.mstid order by hstname2, hstyear, hstmonth '
+        stmt = """SELECT hstid, hstyear, hstmonth, hstname, hstid2, hstname2, hstasig, mstgenero, mststatus 
+        FROM msthistori a, mststudent b 
+        where a.hstid = b.mstid 
+        order by hstname2, hstyear, hstmonth """
         inx.execute(stmt)
         studentshst = inx.fetchall()
         return render_template('inqhistoricoa.html', students=studentshst, idpgmmonth=idpgmmonth, idt=idt)

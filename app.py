@@ -370,7 +370,6 @@ def topico_revisita(planid, periodo, name_student):
     else:
         pass
 
-
 @app.route('/topico_lectura/<pgmid> <period> <name_student>', methods=['GET', 'POST'])
 def topico_lectura(pgmid, period, name_student):
     if request.method == 'GET':
@@ -387,11 +386,14 @@ def topico_lectura(pgmid, period, name_student):
         rcdplan = inx.fetchone()
 
         if not name_student:
-            sqlpgm = """select mstid, hstyear, hstmonth, hstname, hstid2, hstname2, hstasig, mstgenero, 
-        mststatus, mstcargo
-        FROM msthistori a, mststudent b 
-        WHERE a.hstid=b.mstid and hstyear>=%s and hstmonth>=%s and (mstgenero like %s or mstgenero like %s)
-        and not (mststatus = %s or mststatus = %s) """
+            sqlpgm = """select mstid, hstyear, hstmonth, hstname, hstid2, hstname2, hstasig, 
+            mstgenero, mststatus, mstcargo 
+            from msthistori a, mststudent b 
+            where a.hstid=b.mstid 
+            and hstyear>=%s 
+            and hstmonth>=%s 
+            and (mstgenero like %s or mstgenero like %s)
+            and not (mststatus = %s or mststatus = %s) """
             valpgm = (anio, mes, sexolower, sexoupper, censurado, expulsado)
             inx = cnx.cursor(buffered=True)
             inx.execute(sqlpgm, valpgm)
@@ -399,10 +401,15 @@ def topico_lectura(pgmid, period, name_student):
         else:
             name = '%' + name_student + '%'
             sqlpgm = """select mstid, hstyear, hstmonth, hstname, hstid2, hstname2, hstasig, 
-        mstgenero, mststatus, mstcargo
-        FROM msthistori a, mststudent b 
-        WHERE a.hstid=b.mstid and hstyear>=%s and hstmonth>=%s and hstname like %s and (mstgenero like %s or
-        mstgenero like %s ) and not (mststatus = %s or mststatus = %s) """
+                    mstgenero, mststatus, mstcargo
+                    from msthistori a, mststudent b 
+                    where a.hstid=b.mstid 
+                    and hstyear>=%s 
+                    and hstmonth>=%s 
+                    and hstname like %s 
+                    and (mstgenero like %s 
+                    or mstgenero like %s ) 
+                    and not (mststatus = %s or mststatus = %s) """
             valpgm = (anio, mes, name, sexolower, sexoupper, censurado, expulsado)
             inx = cnx.cursor(buffered=True)
             inx.execute(sqlpgm, valpgm)
@@ -429,33 +436,25 @@ def topico_lectura(pgmid, period, name_student):
         flash('revisar funcion de topico_lectura')
         return redirect(url_for('Index'))
 
-
 @app.route('/Subtopico_revisita_aux/<idt> <idplan>', methods=['GET', 'POST'])
 def Subtopico_revisita_aux(idt, idplan):
-    sql_mst = """ select * 
-    FROM mststudent 
-    WHERE mstid=%s """
-
+    sql_mst = """ select * from mststudent where mstid=%s """
     inx = cnx.cursor(buffered=True)
     inx.execute(sql_mst, (idt,))
     rcdmst = inx.fetchone()
 
-    sql_plan = """ select * 
-    FROM programamensual 
-    WHERE pgmid_pm = %s """
-
+    sql_plan = """ select * from programamensual where pgmid_pm = %s """
     inx = cnx.cursor(buffered=True)
     inx.execute(sql_plan, (idplan,))
     rcdplan = inx.fetchone()
-
-    stmt = """select hstid, hstyear, hstmonth, hstname, hstid2, hstname2, hstasig, mstgenero, mststatus 
-    FROM msthistori a, mststudent b 
-    WHERE a.hstid = b.mstid order by hstname2, hstyear, hstmonth """
-
+    stmt = """select hstid, hstyear, hstmonth, hstname, hstid2, hstname2, hstasig, mstgenero, 
+            mststatus 
+            from msthistori a, mststudent b 
+            where a.hstid = b.mstid 
+            order by hstname2, hstyear, hstmonth """
     inx = cnx.cursor(buffered=True)
     inx.execute(stmt)
     studentshst = inx.fetchall()
-
     if request.method == 'GET':
         if not rcdmst:
             flash(f'error grave, no hay id titular, {idt}')
@@ -463,7 +462,6 @@ def Subtopico_revisita_aux(idt, idplan):
         if not rcdplan:
             flash(f'error grave, no hay id plan maestro, {idplan}')
             return redirect(url_for('Index'))
-
         # f(Subtopico_revisita_aux)
         return render_template('Subtopico_revisita_auxfm.html', stuname=(rcdmst[1]),
                                stugenero=(rcdmst[3]), stustatus=(rcdmst[7]), semanai=(rcdplan[6]),
@@ -478,29 +476,20 @@ def Subtopico_revisita_aux(idt, idplan):
         separarador = periodo.find('-')
         anio = int(periodo[0:separarador])
         mes = int(periodo[separarador + 1:len(periodo)])
-
-        sql_mst = """ select MSTID, MSTNAME,MSTGENERO,MSTSTATUS  
-      FROM mststudent 
-      WHERE mstid = %s """
-
+        sql_mst = """ select mstid, mstname, mstgenero, mststatus  
+                from mststudent where mstid = %s """
         inx = cnx.cursor(buffered=True)
         inx.execute(sql_mst, (idt,))
         rcdmst = inx.fetchone()
-
-        sql_plan = """  select * 
-      FROM programamensual 
-      WHERE pgmid_pm = %s """
-
+        sql_plan = """  select * from programamensual where pgmid_pm = %s """
         inx = cnx.cursor(buffered=True)
         inx.execute(sql_plan, (idplan,))
         rcdplan = inx.fetchone()
-
         if not rcdmst:
             flash(f'error en el maestro de estudiante, {idt}')
             return render_template('Subtopico_revisita_auxfm.html', stuname=(rcdmst[1]),
                                    stugenero=(rcdmst[3]), stustatus=(rcdmst[7]), semanai=(rcdplan[6]),
                                    semanaf=(rcdplan[7]), topico=(rcdplan[8]), idpgmmonth=idplan, idt=idt)
-
         if not rcdplan:
             flash('error en el plan maestro, {idplan}')
             return render_template('Subtopico_revisita_auxfm.html', stuname=(rcdmst[1]),
@@ -514,52 +503,52 @@ def Subtopico_revisita_aux(idt, idplan):
             inx = cnx.cursor(buffered=True)
             sqlcrta = """ create table hsta as select a.mstid, c.hstyear, c.hstmonth, a.mstname, a.mstgenero, a.mststatus,
                            c.hstasig, c.hstid2, hstname2 
-                           FROM msthistori c 
+                           from msthistori c 
                            INNER JOIN mststudent a 
                            ON c.hstid = a.mstid """
             inx.execute(sqlcrta)
             cnx.commit
         except:
             inx = cnx.cursor(buffered=True)
-            sqlcrta = """ create table hsta as select a.mstid, c.hstyear, c.hstmonth, a.mstname, a.mstgenero, a.mststatus,
-                           c.hstasig, c.hstid2, hstname2 
-                           FROM msthistori c 
-                           INNER JOIN mststudent a 
-                           ON c.hstid = a.mstid """
+            sqlcrta = """ create table hsta as select a.mstid, c.hstyear, c.hstmonth, a.mstname, 
+                        a.mstgenero, a.mststatus, c.hstasig, c.hstid2, hstname2 
+                        from msthistori c 
+                        INNER JOIN mststudent a 
+                        ON c.hstid = a.mstid """
             inx.execute(sqlcrta)
             cnx.commit
-
         try:
             inx = cnx.cursor(buffered=True)
             sqlcrtb = """ drop table if exists hstb """
             inx.execute(sqlcrtb)
             cnx.commit
             inx = cnx.cursor(buffered=True)
-            sqlcrtb = """ create table hstb as select a.mstid, a.hstyear, a.hstmonth, a.mstname, a.mstgenero, a.mststatus, a.hstasig 
-          FROM hsta a  
-          INNER JOIN mststudent b
-          ON a.hstid2 = b.mstid """
+            sqlcrtb = """ create table hstb as select a.mstid, a.hstyear, a.hstmonth, a.mstname, 
+                    a.mstgenero, a.mststatus, a.hstasig 
+                    from hsta a  
+                    INNER JOIN mststudent b
+                    ON a.hstid2 = b.mstid """
             inx.execute(sqlcrtb)
             cnx.commit
         except:
             inx = cnx.cursor(buffered=True)
-            sqlcrtb = """ create table hstb as select a.mstid, a.hstyear, a.hstmonth, a.mstname, a.mstgenero, a.mststatus, a.hstasig 
-          FROM hsta a  
-          INNER JOIN mststudent b
-          ON a.hstid2 = b.mstid """
+            sqlcrtb = """ create table hstb as select a.mstid, a.hstyear, a.hstmonth, a.mstname, 
+                    a.mstgenero, a.mststatus, a.hstasig 
+                    from hsta a  
+                    INNER JOIN mststudent b
+                    ON a.hstid2 = b.mstid """
             inx.execute(sqlcrtb)
             cnx.commit
-
         name = request.form['name']
-
         if not name:
-            sqlhst = """ select distinct a.mstid, a.hstyear, a.hstmonth, a.mstname, a.mstgenero, a.mststatus,
-          c.idmst, c.namemst, c.generomst, c.statusmst,
-          a.hstasig FROM hsta a 
-          INNER JOIN hstb c 
-          ON a.hstid2 = c.idmst
-          WHERE a.hstyear>=%s and a.hstmonth>=%s
-          ORDER BY a.mstname, a.hstyear, a.hstmonth """
+            sqlhst = """ select distinct a.mstid,a.hstyear,a.hstmonth,a.mstname,a.mstgenero,a.mststatus,
+                    c.idmst, c.namemst, c.generomst, c.statusmst,a.hstasig 
+                    from hsta a 
+                    INNER JOIN hstb c 
+                    ON a.hstid2 = c.idmst
+                    WHERE a.hstyear>=%s 
+                          and a.hstmonth>=%s
+                    ORDER BY a.mstname, a.hstyear, a.hstmonth """
             hstval = (anio, mes)
             inx.execute(sqlhst, hstval)
             studentshst = inx.fetchall()
@@ -568,20 +557,17 @@ def Subtopico_revisita_aux(idt, idplan):
                 return render_template('Subtopico_revisita_auxfm.html', stuname=(rcdmst[1]),
                                        stugenero=(rcdmst[2]), stustatus=(rcdmst[3]), semanai=(rcdplan[6]),
                                        semanaf=(rcdplan[7]), topico=(rcdplan[8]), idpgmmonth=idplan, idt=idt)
-
         else:
             names = '%' + name + '%'
-            #  SELECT `mstid`, `hstyear`, `hstmonth`, `mstname`, `mstgenero`, `mststatus`, `hstasig`, `hstid2`, `hstname2` FROM `hsta` WHERE 1
-
-            # SELECT `mstid`, `hstyear`, `hstmonth`, `mstname`, `mstgenero`, `mststatus`, `hstasig` FROM `hstb` WHERE 1
-
-            sqlhst = """ select distinct a.mstid, a.hstyear, a.hstmonth, a.mstname, a.mstgenero, a.mststatus,
-          b.mstid, b.mstname, b.mstgenero, b.mststatus, a.hstasig 
-          FROM hsta a 
-          INNER JOIN hstb b 
-          ON a.hstid2 = b.mstid
-          WHERE a.hstyear>=%s and a.hstmonth>=%s and (a.mstname like %s or  b.mstname like %s) 
-          ORDER BY a.hstyear, a.hstmonth, a.mstname, b.mstname """
+            sqlhst = """ select distinct a.mstid, a.hstyear, a.hstmonth, a.mstname, a.mstgenero, 
+            a.mststatus, b.mstid, b.mstname, b.mstgenero, b.mststatus, a.hstasig 
+            FROM hsta a 
+            INNER JOIN hstb b 
+            ON a.hstid2 = b.mstid
+            WHERE a.hstyear>=%s 
+                and a.hstmonth>=%s 
+                and (a.mstname like %s or  b.mstname like %s) 
+            ORDER BY a.hstyear, a.hstmonth, a.mstname, b.mstname """
             hstval = (anio, mes, names, names)
             inx.execute(sqlhst, hstval)
             studentshst = inx.fetchall()
@@ -590,7 +576,6 @@ def Subtopico_revisita_aux(idt, idplan):
                 return render_template('Subtopico_revisita_auxfm.html', stuname=(rcdmst[1]),
                                        stugenero=(rcdmst[2]), stustatus=(rcdmst[3]), semanai=(rcdplan[6]),
                                        semanaf=(rcdplan[7]), topico=(rcdplan[8]), idpgmmonth=idplan, idt=idt)
-
         return render_template('subtopico_rev_aux_filrofm.html',
                                students=studentshst,
                                stuname=(rcdmst[1]),

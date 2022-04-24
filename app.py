@@ -1,54 +1,3 @@
-Skip
-to
-content
-Pull
-requests
-Issues
-Marketplace
-Explore
-
-
-@Imixanxa
-
-
-Imixanxa /
-jwvmcrep
-Public
-
-Code
-Issues
-Pull
-requests
-Actions
-Projects
-Wiki
-Security
-Insights
-
-Settings
-
-jwvmcrep / app.py /
-
-
-@Imixanxa
-
-
-Imixanxa
-Update
-app.py
-Latest
-commit
-fcf5a0d
-20
-seconds
-ago
-History
-1
-contributor
-1269
-lines(1107
-sloc) 54
-KB
 from codecs import BufferedIncrementalDecoder
 from typing import List, Type
 from flask import Flask, render_template, request, redirect, url_for, flash
@@ -830,10 +779,7 @@ def procesoest_aux(idname, idpgmmonth, idt):
     if dataprim == None:
         return redirect(url_for('Index'))
     tipoasignacion = (dataprim[8])
-    print(tipoasignacion)
     return render_template('Subtopico_wrt_revisita.html', dataprim=dataprim, recstudt=recstudt, recstuda=recstuda)
-
-
 @app.route('/Subtopico_rev_upd/<int:pgmid> <idt> <ida>', methods=['POST', 'GET'])
 def grabaasignacion(pgmid, idt, ida):
     if request.method == 'POST':
@@ -850,12 +796,10 @@ def grabaasignacion(pgmid, idt, ida):
         stmtsql = """ select * from programamensual where pgmid_pm = %s """
         inx.execute(stmtsql, (pgmid,))
         rcdpgm_month = inx.fetchone()
-
         inx = cnx.cursor(buffered=True)
         stmtsql = """ select * from mststudent where mstid = %s """
         inx.execute(stmtsql, (idt,))
         rcdstudt = inx.fetchone()
-
         inx = cnx.cursor(buffered=True)
         stmtsql = """ select * from mststudent where mstid = %s """
         inx.execute(stmtsql, (ida,))
@@ -886,7 +830,6 @@ def grabaasignacion(pgmid, idt, ida):
                     primerafecha = primerafecha.replace(meses[i], ('0' + str(j)))
                 else:
                     primerafecha = primerafecha.replace(mes, str(mesnum))
-
                 if (flagmesinicial == True):
                     # el texto empieza con el nombre del mes
                     primerafechames = primerafecha[0:2]
@@ -899,10 +842,8 @@ def grabaasignacion(pgmid, idt, ida):
                     pgmdateinicial = datetime.strptime(primerafecha, '%d de %m de %Y a las %H:%M')
                     pgmdateinicial = pgmdateinicial.strftime('%d-%m-%Y')
                 mesnum += 1
-
         if not bool:
             return redirect(url_for('Index'))
-
         fechafalse = datetime(int(pgmdateinicial[6:10]), int(pgmdateinicial[3:5]), int(pgmdateinicial[0:2]))
         pgmdatefinal = fechafalse + timedelta(days=6)
         pgmdatefinal = pgmdatefinal.strftime('%d-%m-%Y')
@@ -913,56 +854,39 @@ def grabaasignacion(pgmid, idt, ida):
         pgmdatefinal = datetime.strptime(str(pgmdatefinal), '%d-%m-%Y')
         pgmdateinicial = datetime.date(pgmdateinicial)
         pgmdatefinal = datetime.date(pgmdatefinal)
-
         # print(dir(datetime))
-
         inx = cnx.cursor(buffered=True)
         stmtsql = """ select * from programamensual where pgmid_pm = %s """
         inx.execute(stmtsql, (pgmid,))
         rcdpgm_month = inx.fetchone()
-
-        updatesql = """ 
-      UPDATE programamensual
-      SET actualizadofecha = '{}', 
-            actualizadohora = '{}',
-            pgmdateinicial = '{}',
-            pgmdatefinal = '{}'
-      WHERE
-            pgmid_pm = '{}' 
-            """.format(fecha, hora, pgmdateinicial, pgmdatefinal, pgmid)
-
+        updatesql = """ UPDATE programamensual SET actualizadofecha = '{}', actualizadohora = '{}',
+                    pgmdateinicial = '{}', pgmdatefinal = '{}'
+                    WHERE pgmid_pm = '{}' 
+                    """.format(fecha, hora, pgmdateinicial, pgmdatefinal, pgmid)
         pgmfechaistr = pgmdateinicial.strftime('%B %d, %Y')
         pgmfechafstr = pgmdatefinal.strftime('%B %d, %Y')
-
-        sqlinsert = """INSERT INTO asignaciones (idt_asig, ida_asig, pgmano, pgmmes, pgmtiempo, pgmleccion, 
-      pgmsemanafull, pgmtipoasig, pgmtexto, pgmsala, pgmtipot, pgmtipoa, pgmnombret, pgmnombrea, pgmgenerot, 
-      pgmgeneroa, cumplio, pgmdateinicial, pgmdatefinal, pgmfechaistr, pgmfechafstr) 
-      VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+        sqlinsert = """INSERT INTO asignaciones (idt_asig, ida_asig, pgmano, pgmmes, pgmtiempo, 
+                    pgmleccion, pgmsemanafull, pgmtipoasig, pgmtexto, pgmsala, pgmtipot, pgmtipoa, 
+                    pgmnombret, pgmnombrea, pgmgenerot, pgmgeneroa, cumplio, pgmdateinicial, 
+                    pgmdatefinal, pgmfechaistr, pgmfechafstr) 
+                    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
         sqlvalue = (idt, ida, (rcdpgm_month[1]), (rcdpgm_month[2]), (rcdpgm_month[3]), (rcdpgm_month[4]),
                     (rcdpgm_month[5]), pgmtipoasig, pgmtexto, pgmsala, pgmtipot, pgmtipoa, pgmnombret, pgmnombrea,
                     pgmgenerot, pgmgeneroa, 'XY', pgmdateinicial, pgmdatefinal, pgmfechaistr, pgmfechafstr)
-
         sql_hst = """ insert into msthistori values ( %s, %s, %s, %s, %s, %s, %s) """
         sql_hst_values = (idt, (rcdpgm_month[1]), (rcdpgm_month[2]), (rcdstudt[1]), ida, (rcdstuda[1]), pgmtipoasig)
-
-        sqlkeydup = """ select * from msthistori 
-      where hstyear = %s and hstmonth = %s and hstname = %s  """
+        sqlkeydup = """ select * from msthistori where hstyear = %s and hstmonth = %s and hstname = %s  """
         sqlkeydupv = ((rcdpgm_month[1]), (rcdpgm_month[2]), (rcdstudt[1]))
         inx = cnx.cursor(buffered=True)
         inx.execute(sqlkeydup, sqlkeydupv)
         rcddup = inx.fetchall()
         if rcddup != None:
             for keydup in rcddup:
-                print((keydup[1]), (keydup[2]), (keydup[3]))
-                print('test duplicado revisita ' 'anioo', ' ', (rcdpgm_month[1]), ' ', 'mes', ' ', (rcdpgm_month[2]),
-                      ' ', 'nombre', ' ', (rcdstudt[1]))
                 if ((keydup[1]) == (rcdpgm_month[1]) and
                         (keydup[2]) == (rcdpgm_month[2]) and
                         ((keydup[3]) == (rcdstudt[1]) or (keydup[3]) == (rcdstuda[1]))):
                     flash(f'Error-2. student already assigned in that period, {(rcdstudt[1])} ')
                     return redirect(url_for('Index'))
-        print('NO hay duplicado en el historico: ', datetime.now(), ' ', sqlkeydupv)
-
         try:
             cnxsql = cnx.cursor(buffered=True)
             cnxsql.execute(sql_hst, sql_hst_values)
@@ -972,7 +896,6 @@ def grabaasignacion(pgmid, idt, ida):
             print(e)
             flash(f'error1.1 al intentar grabar asignacion en base historico, {pgmnombret}')
             return redirect(url_for('Index'))
-
         try:
             inx = cnx.cursor(buffered=True)
             inx.execute(updatesql)
@@ -981,7 +904,6 @@ def grabaasignacion(pgmid, idt, ida):
             print(e)
             flash(f'error.1.2 no se pudo actualizar base plan maestro, {pgmid}')
             return redirect(url_for('Index'))
-
         try:
             inx = cnx.cursor(buffered=True)
             inx.execute(sqlinsert, sqlvalue)
@@ -991,10 +913,7 @@ def grabaasignacion(pgmid, idt, ida):
             print("This is an error message!{}".format(e))
             flash(f'error1.3 Hubo error al intentar grabar base asignaciones, {pgmnombret}')
             return redirect(url_for('Index'))
-
     return redirect(url_for('Index'))
-
-
 @app.route('/Subtopico_rev_pre_wrtxyz/<ida> <idpgmmonth> <idt>', methods=['POST', 'GET'])
 def Subtopico_rev_pre_wrtxyz(ida, idpgmmonth, idt):
     if request.method == 'GET':
@@ -1002,35 +921,29 @@ def Subtopico_rev_pre_wrtxyz(ida, idpgmmonth, idt):
         stmt = """ SELECT mstid, mstname, mstgenero, msttipoe, mststatus FROM mststudent where mstid = %s """
         inx.execute(stmt, (idt,))
         rcdmstt = inx.fetchone()
-
         inx = cnx.cursor(buffered=True)
         stmt = """ select * from programamensual where pgmid_pm = %s """
         inx.execute(stmt, (idpgmmonth,))
         rcdplan = inx.fetchone()
-
         inx = cnx.cursor(buffered=True)
         stmt = """ SELECT mstid, mstname, mstgenero, msttipoe, mststatus FROM mststudent where mstid = %s """
         inx.execute(stmt, (ida,))
         rcdmsta = inx.fetchone()
-
         inx = cnx.cursor(buffered=True)
-        stmt = """select hstid, hstyear, hstmonth, hstname, hstid2, hstname2, hstasig, mstgenero, mststatus 
-      FROM msthistori a, mststudent b where a.hstid = b.mstid order by hstname2, hstyear, hstmonth """
+        stmt = """select hstid, hstyear, hstmonth, hstname, hstid2, hstname2, hstasig, mstgenero, 
+                mststatus FROM msthistori a, mststudent b where a.hstid = b.mstid 
+                order by hstname2, hstyear, hstmonth """
         inx.execute(stmt)
         rcdhst = inx.fetchall()
-
         if not rcdmstt:
             flash(f'Id del estudiante principal no existe en mststudent, {idt}')
             return redirect(url_for('Index'))
-
         if not rcdplan:
             flash(f'Id del plan maestro no existe en programa mensual, {idpgmmonth}')
             return redirect(url_for('Index'))
-
         if not rcdhst:
             flash(f'estudiantes historicos no existe en msthistori, {idt}')
             return redirect(url_for('Index'))
-
         if not rcdmsta:
             flash(f'Id del estudiante auxiliar no existe en mststudent, {ida}')
             return render_template('subtopico_rev_aux_filrofm.html',
@@ -1040,8 +953,9 @@ def Subtopico_rev_pre_wrtxyz(ida, idpgmmonth, idt):
                                    stustatus=(rcdmstt[4]),
                                    semanai=(rcdplan[6]),
                                    semanaf=(rcdplan[7]),
-                                   topico=(rcdplan[8]), idt=idt, idplan=idpgmmonth)
-
+                                   topico=(rcdplan[8]),
+                                   idt=idt,
+                                   idplan=idpgmmonth)
         pgmgenerot = (rcdmstt[2])
         pgmgeneroa = (rcdmsta[2])
         if pgmgenerot != pgmgeneroa:
@@ -1053,14 +967,14 @@ def Subtopico_rev_pre_wrtxyz(ida, idpgmmonth, idt):
                                    semanai=(rcdplan[6]),
                                    semanaf=(rcdplan[7]),
                                    topico=(rcdplan[8]),
-                                   idpgmmonth=idpgmmonth, idt=idt)
-
-        return render_template('Subtopico_wrt_revisita.html', dataprim=rcdplan, recstudt=rcdmstt,
+                                   idpgmmonth=idpgmmonth,
+                                   idt=idt)
+        return render_template('Subtopico_wrt_revisita.html',
+                               dataprim=rcdplan,
+                               recstudt=rcdmstt,
                                recstuda=rcdmsta)
     else:
         pass
-
-
 @app.route('/registrazione', methods=['POST'])
 def registration():
     if request.method == 'POST':
@@ -1068,38 +982,29 @@ def registration():
         if (Req_semana_inicial == ''):
             flash('missing to enter period week and year')
             return redirect(url_for('ipvmd'))
-
         # manejo de semanas
         anosemana = int(Req_semana_inicial[0:4])
         semana = int(Req_semana_inicial[6:8])
         Req_fecha_inicial = date(anosemana, 1, 1) + relativedelta(weeks=semana - 1, weekday=MO(1))
         # fin manejo semanas
-
         yystr = Req_fecha_inicial.strftime('%Y')
         mm = Req_fecha_inicial.strftime('%m')
         dd = Req_fecha_inicial.strftime('%d')
         yydec = int(yystr)
         mmdec = int(mm)
         dddec = int(dd)
-
         fechaint = int(str(yystr + mm + dd))
         fechaparcial = datetime.strptime(str(fechaint), '%Y%m%d')
         # 2020-09-28 00:00:00   <class 'datetime.datetime'>
         pgmfechaistr = fechaparcial.strftime('%B %d, %Y')
-        # fecha final September 28, 2020
-        # calculo de la fecha final de la semana
         fechaparcial = datetime(year=yydec, month=mmdec, day=dddec)
-
         fecha_final = fechaparcial + timedelta(days=6)
         fechasemanafinal = fecha_final.date()
-
         pgmfechafstr = fecha_final.strftime('%B %d, %Y')
-
         Req_texto = request.form['Req_texto']
         if not Req_texto:
             flash('missing to enter the description of the topic')
             return redirect(url_for('ipvmd'))
-
         pretiempo = re.findall('\d+.mins.', Req_texto)
         if not pretiempo:
             flash(f'no hay un formato correcto del tiempo. revise formato de minutos')
@@ -1112,7 +1017,6 @@ def registration():
         postiempo = Req_texto.find(Req_tiempo)
         Req_tipo = Req_texto[0:postiempo - 1]
         print(Req_tipo)
-
         inxtipo = Req_tipo.find('Video')
         print(inxtipo)
         if inxtipo == -1:
@@ -1128,7 +1032,6 @@ def registration():
         else:
             Req_leccion = 99
         fechaconcatenada = pgmfechaistr + ' ' + '-' + ' ' + pgmfechafstr + ' ' + '-' + ' ' + Req_tipo
-
         fechahoracurrent = datetime.now()
         anocurrent = fechahoracurrent.year
         mescurrent = fechahoracurrent.month
@@ -1138,40 +1041,37 @@ def registration():
         horaupdate = timedelta(hours=23, minutes=59, seconds=59)
         fechaupdate = date.fromisoformat('2000-12-31')
         fechaupdate = date(2000, 12, 31)
-
         semanacorriente = int(date(yydec, mmdec, dddec).strftime("%V"))
         numerodiasemana = date(yydec, mmdec, dddec).weekday()
         arraydiasemana = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
         nombredeldiadelasemana = date(yydec, mmdec, dddec).strftime("%A")
-
         # clave duplicada programa mensual
         inx = cnx.cursor(buffered=True)
         stmtsqltest = 'select * from programamensual where pgmano=%s and pgmmes=%s and pgmtiempo=%s and pgmleccion=%s and pgmsemanafull=%s'
         stmtsqlvalue = (yydec, mmdec, Req_tiempo, Req_leccion, fechaconcatenada)
         inx.execute(stmtsqltest, stmtsqlvalue)
-
         dbpgmmensual = inx.fetchone()
-
         if dbpgmmensual != None:
             flash('error: Datos fueron previamente ingresados en el PROGRAMA MENSUAL')
             return render_template('plan_maestro.html')
-
-        stmtsql = ('select * from controlweek where yearcurrent = %s and weekcurrent = %s order by kountcurrent desc')
+        stmtsql = """select * from controlweek 
+                    where yearcurrent = %s 
+                    and weekcurrent = %s 
+                    order by kountcurrent desc"""
         stmtvalue = (yydec, semanacorriente)
         inx = cnx.cursor(buffered=True)
         inx.execute(stmtsql, stmtvalue)
         datadb = inx.fetchone()
-
         if datadb == None:
             if (nombredeldiadelasemana == arraydiasemana[numerodiasemana]):
                 kontador = 1
                 inx = cnx.cursor(buffered=True)
                 stmtsql = """INSERT INTO programamensual (pgmano, pgmmes, pgmtiempo, pgmleccion, pgmsemanafull, pgmtipoasig, pgmtexto, pgmdateinicial, pgmdatefinal, pgmsemanai, pgmsemanaf,pgmmesletra,ingresousuario, ingresofecha, ingresohora, ingresopgm, actualizadouser,  actualizapgm, numerosemana) 
                         VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
-                stmtvalue = (
-                yydec, mmdec, Req_tiempo, Req_leccion, fechaconcatenada, Req_tipo, Req_texto, Req_fecha_inicial,
-                fechasemanafinal, pgmfechaistr, pgmfechafstr, 'xxxxxxxxxx', 'isidro', fechacurrent, horacurrent,
-                'appx.py', ' ', ' ', semanacorriente)
+                stmtvalue = (yydec, mmdec, Req_tiempo, Req_leccion, fechaconcatenada, Req_tipo,
+                             Req_texto, Req_fecha_inicial, fechasemanafinal, pgmfechaistr,
+                             pgmfechafstr, 'xxxxxxxxxx', 'isidro', fechacurrent, horacurrent,
+                             'appx.py', ' ', ' ', semanacorriente)
                 try:
                     inx.execute(stmtsql, stmtvalue)
                     flash('asignacion mensual DATA INGRESADA EN LA BASE ')
@@ -1194,15 +1094,14 @@ def registration():
             else:
                 flash('Error en el ingreso del Inicio de la Semana')
                 return render_template('plan_maestro.html')
-
         elif (datadb[2]) <= 4:
             if (nombredeldiadelasemana == arraydiasemana[numerodiasemana]):
                 kontador = (datadb[2]) + 1
                 stmtsql = 'INSERT INTO programamensual (pgmano, pgmmes, pgmtiempo, pgmleccion, pgmsemanafull, pgmtipoasig, pgmtexto, pgmdateinicial, pgmdatefinal, pgmsemanai, pgmsemanaf,pgmmesletra,ingresousuario, ingresofecha, ingresohora, ingresopgm, actualizadouser,  actualizapgm, numerosemana) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-                stmtvalue = (
-                yydec, mmdec, Req_tiempo, Req_leccion, fechaconcatenada, Req_tipo, Req_texto, Req_fecha_inicial,
-                fechasemanafinal, pgmfechaistr, pgmfechafstr, 'xxxxxxxxxx', 'isidro', fechacurrent, horacurrent,
-                'appx.py', ' ', ' ', semanacorriente)
+                stmtvalue = (yydec, mmdec, Req_tiempo, Req_leccion, fechaconcatenada, Req_tipo,
+                             Req_texto, Req_fecha_inicial,fechasemanafinal, pgmfechaistr,
+                             pgmfechafstr, 'xxxxxxxxxx', 'isidro', fechacurrent, horacurrent,
+                             'appx.py', ' ', ' ', semanacorriente)
                 try:
                     inx.execute(stmtsql, stmtvalue)
                     flash('DATA INGRESADA EN LA BASE programa de asignacion mensual')
@@ -1220,24 +1119,19 @@ def registration():
                         return render_template('plan_maestro.html')
                 except errorcode as e:
                     print(e)
-                    flash('error al ingresar datos en la base "programa de asignacion mensual"')
                     return render_template('plan_maestro.html')
+                    flash('error al ingresar datos en la base "programa de asignacion mensual"')
             else:
                 flash('Error en el ingreso de Inicio de Semana')
                 return render_template('plan_maestro.html')
         else:
             flash('Error en el numero de asignaciones, excede a 5')
             return render_template('plan_maestro.html')
-
-
 @app.route('/plan_maestro')
 def ipvmd():
     anocurrent = date.today()
     anocurrent = int(anocurrent.year)
-
     return render_template('plan_maestro.html')
-
-
 @app.route('/subtopicos/<pgmid_pm>', methods=['POST', 'GET'])
 def subtopicos(pgmid_pm):
     if request.method == 'GET':
@@ -1267,26 +1161,5 @@ def subtopicos(pgmid_pm):
     else:
         pass
     return redirect(url_for('Index'))
-
-
 if __name__ == '__main__':
     app.run(port=3000, debug=True)
-
-6587
-
-© 2022
-GitHub, Inc.
-
-Terms
-Privacy
-Security
-Status
-Docs
-Contact
-GitHub
-Pricing
-API
-Training
-Blog
-About
-

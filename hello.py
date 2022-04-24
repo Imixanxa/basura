@@ -15,6 +15,7 @@ git commit -m "first commit"
 git branch -M main
 git remote set-url origin https://github.com/Imixanxa/basura.git
 git push -u origin main
+ghp_gJRkIQd0Qm54kSObfL8xafyZymRogH0p2pad2
 826         return render_template('inqhistoricoa.html', students=studentshst, idpgmmonth=idpgmmonth, idt=idt)
 
 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
